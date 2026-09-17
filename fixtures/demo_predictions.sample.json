@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0",
+  "model_version": "beautypulse-v1",
+  "generated_at": "2026-09-18T08:00:00Z",
+  "candidates": [
+    {
+      "sku_id": "5000001",
+      "display_alias": "New Beauty SKU A",
+      "brand": "runail",
+      "category_cluster_id": "1487580005134238553",
+      "category_label": null,
+      "representative_price": 12.5,
+      "observed_launch_date": "2019-11-03",
+      "eligibility": "eligible",
+
+      "analogs": [
+        {
+          "sku_id": "5000101",
+          "display_alias": "Historical Beauty SKU A",
+          "brand": "runail",
+          "category_cluster_id": "1487580005134238553",
+          "category_label": null,
+          "representative_price": 12.9,
+          "observed_launch_date": "2019-10-10",
+          "eligibility": "eligible",
+
+          "similarity_rank": 1,
+          "similarity_score": 0.93,
+          "similarity_reasons": [
+            "Same category cluster",
+            "Similar price band",
+            "Same brand"
+          ],
+          "actual_purchase_events_7d": 105,
+          "actual_purchase_events_14d": 195
+        }
+      ],
+
+      "initial_forecast": {
+        "projected_total_day_7": 120,
+        "projected_total_day_14": 210,
+        "range_low_day_7": 90,
+        "range_high_day_7": 150,
+        "range_low_day_14": 170,
+        "range_high_day_14": 260
+      },
+
+      "early_metrics": {
+        "day_cutoff": 3,
+        "views": 4200,
+        "unique_viewers": 3300,
+        "cart_events": 310,
+        "unique_cart_users": 270,
+        "remove_events": 35,
+        "purchase_events": 58,
+        "unique_purchasers": 52,
+        "view_to_cart_rate": 0.0818,
+        "view_to_purchase_rate": 0.0158,
+        "cart_to_purchase_rate": 0.1926
+      },
+
+      "adaptive_forecast": {
+        "actual_purchase_events_day_1_3": 58,
+        "remaining_purchase_events_day_4_7": 107,
+        "projected_total_day_7": 165,
+        "remaining_purchase_events_day_4_14": 232,
+        "projected_total_day_14": 290,
+        "change_day_7_percent": 37.5,
+        "change_day_14_percent": 38.1,
+        "range_low_day_7": 145,
+        "range_high_day_7": 185,
+        "range_low_day_14": 255,
+        "range_high_day_14": 320
+      },
+
+      "alert": {
+        "status_code": "ABOVE_EXPECTATION",
+        "confidence": 0.78,
+        "evidence": [
+          "Adaptive 14-day forecast increased by 38.1%",
+          "Purchase velocity is above the Day-3 analog median"
+        ]
+      }
+    }
+  ]
+}
