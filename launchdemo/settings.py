@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +23,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-nf+v9iem2m!5g2xfdk5@(0$w2^s!+(_ddi4@k!zn6y^mt$d+2%'
+# In Railway, set a SECRET_KEY env var (Settings -> Variables). Locally it
+# falls back to this insecure default, which is fine for a 24h demo.
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY', 'django-insecure-nf+v9iem2m!5g2xfdk5@(0$w2^s!+(_ddi4@k!zn6y^mt$d+2%'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Set DEBUG=False as an env var on Railway. Defaults to True locally.
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+# Railway gives your app a domain like xxxx.up.railway.app. Set
+# ALLOWED_HOSTS=yourapp.up.railway.app as an env var, or leave unset to
+# allow all hosts (fine for a demo, not for real production).
+_allowed_hosts_env = os.environ.get('ALLOWED_HOSTS', '')
+ALLOWED_HOSTS = _allowed_hosts_env.split(',') if _allowed_hosts_env else ['*']
 
 
 # Application definition
@@ -45,6 +57,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,12 +88,17 @@ WSGI_APPLICATION = 'launchdemo.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
+#
+# Local dev: no DATABASE_URL set -> falls back to SQLite (db.sqlite3), same
+# as before. On Railway: add a Postgres addon, and Railway automatically
+# injects a DATABASE_URL env var into this service -> dj_database_url picks
+# it up and switches to Postgres, no code change needed.
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        conn_max_age=600,
+    )
 }
 
 
@@ -129,6 +147,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # collectstatic dumps here in production
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # Uploaded files (e.g. user's own Excel data) land here. MVP: stored as-is,
 # not parsed. Fine for local dev; a real deployment would use cloud storage.

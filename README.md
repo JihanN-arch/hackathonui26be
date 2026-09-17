@@ -127,3 +127,54 @@ Excel file into new candidate SKUs, that's a separate, bigger feature
 (column mapping, validation, matching against the REES46 category/brand
 values) — intentionally not built here.
 
+## 8. Deploying to Railway
+
+The app reads `DATABASE_URL` automatically (via `dj-database-url`) — no
+code changes needed between local dev and Railway.
+
+1. **Push this project to a GitHub repo** (or use `railway up` from the CLI
+   directly).
+2. **Create a new Railway project** from that repo.
+3. **Add a Postgres database**: in the Railway project, click "+ New" ->
+   "Database" -> "Add PostgreSQL". Railway automatically injects a
+   `DATABASE_URL` env var into your app service — you don't set this
+   yourself.
+4. **Set these env vars** on the app service (Settings -> Variables):
+   | Variable | Value |
+   |---|---|
+   | `SECRET_KEY` | any random long string |
+   | `DEBUG` | `False` |
+   | `ALLOWED_HOSTS` | your Railway domain, e.g. `yourapp.up.railway.app` |
+5. **Deploy.** The `Procfile`'s `release: python manage.py migrate` runs
+   the migrations; `web: gunicorn ...` starts the app. If your Railway
+   setup doesn't run the `release` step automatically, run it manually
+   once via the Railway CLI:
+   ```bash
+   railway run python manage.py migrate
+   ```
+6. **Seed the data** (this is a separate, manual step — Railway won't do
+   this on its own):
+   ```bash
+   railway run python manage.py load_demo_data fixtures/demo_predictions.sample.json --flush
+   ```
+   Swap in the real ML export path once you upload it into the Railway
+   environment (or `railway run` with a local file path — check current
+   Railway CLI docs for how file args are passed through).
+7. **Create an admin user** for `/admin`, same as local:
+   ```bash
+   railway run python manage.py createsuperuser
+   ```
+
+### Things that behave differently on Railway vs local
+
+- **Postgres persists** across deploys/restarts — unlike a plain SQLite
+  file on Railway's ephemeral disk, so seeded data survives redeploys.
+- **Uploaded files** (`/api/datasets/upload`) still land on local disk
+  (`media/`), which is ephemeral on Railway — an uploaded file can
+  disappear after a redeploy/restart. Fine for a demo; would need object
+  storage (S3-compatible) for anything longer-lived.
+- **`collectstatic`** needs to run once so `/admin`'s CSS loads correctly
+  in production (Whitenoise serves it): `railway run python manage.py collectstatic --noinput`.
+  If you used the `release` step in the Procfile, add this there too.
+
+
