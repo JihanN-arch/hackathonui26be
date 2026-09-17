@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -12,6 +13,7 @@ from .models import (
     Product,
     Recommendation,
     SimulationInput,
+    UploadedDataset,
 )
 from .serializers import (
     AnalogLinkSerializer,
@@ -21,7 +23,11 @@ from .serializers import (
     ProductSerializer,
     RecommendationSerializer,
     SimulationInputSerializer,
+    UploadedDatasetSerializer,
 )
+
+ALLOWED_DATASET_EXTENSIONS = (".xlsx", ".xls", ".csv")
+MAX_DATASET_UPLOAD_BYTES = 20 * 1024 * 1024  # 20 MB, generous for a demo
 
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
@@ -261,3 +267,58 @@ class DecisionViewSet(viewsets.ModelViewSet):
     queryset = Decision.objects.all()
     serializer_class = DecisionSerializer
     http_method_names = ["get", "post", "head"]
+
+
+class DatasetUploadView(APIView):
+    """POST /api/datasets/upload  (multipart/form-data)
+    GET  /api/datasets/upload      -> list previously uploaded files
+
+    MVP behaviour: accept and store the file only. We do NOT parse its rows
+    into Product/ForecastResult/etc — that's a separate feature to build
+    later once the column mapping is agreed with the AI/full-stack team.
+    """
+
+    parser_classes = [MultiPartParser]
+
+    def post(self, request):
+        uploaded_file = request.FILES.get("file")
+        if not uploaded_file:
+            return Response(
+                {"detail": "No file provided. Send it as multipart/form-data under the 'file' field."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        name_lower = uploaded_file.name.lower()
+        if not name_lower.endswith(ALLOWED_DATASET_EXTENSIONS):
+            return Response(
+                {
+                    "detail": f"Unsupported file type. Allowed: {', '.join(ALLOWED_DATASET_EXTENSIONS)}",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if uploaded_file.size > MAX_DATASET_UPLOAD_BYTES:
+            return Response(
+                {"detail": f"File too large. Max size is {MAX_DATASET_UPLOAD_BYTES // (1024 * 1024)} MB."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        dataset = UploadedDataset.objects.create(
+            file=uploaded_file,
+            original_filename=uploaded_file.name,
+            uploaded_by=request.data.get("uploaded_by", ""),
+            note=request.data.get("note", ""),
+        )
+
+        return Response(
+            {
+                **UploadedDatasetSerializer(dataset, context={"request": request}).data,
+                "detail": "File received and stored. Its contents have not been parsed or "
+                          "loaded into the app's data (not in MVP scope).",
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+    def get(self, request):
+        datasets = UploadedDataset.objects.all()
+        return Response(UploadedDatasetSerializer(datasets, many=True, context={"request": request}).data)

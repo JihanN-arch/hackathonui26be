@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from .views import (
     AdaptiveForecastView,
+    DatasetUploadView,
     DecisionViewSet,
     InitialForecastView,
     ProductViewSet,
@@ -18,4 +19,5 @@ urlpatterns = [
     path("forecast/initial", InitialForecastView.as_view(), name="forecast-initial"),
     path("forecast/adaptive", AdaptiveForecastView.as_view(), name="forecast-adaptive"),
     path("recommendation", RecommendationView.as_view(), name="recommendation"),
+    path("datasets/upload", DatasetUploadView.as_view(), name="dataset-upload"),
 ]

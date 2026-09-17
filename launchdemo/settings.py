@@ -130,6 +130,11 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Uploaded files (e.g. user's own Excel data) land here. MVP: stored as-is,
+# not parsed. Fine for local dev; a real deployment would use cloud storage.
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration

@@ -8,6 +8,7 @@ from .models import (
     Product,
     Recommendation,
     SimulationInput,
+    UploadedDataset,
 )
 
 
@@ -67,3 +68,9 @@ class SimulationInputAdmin(admin.ModelAdmin):
 class DecisionAdmin(admin.ModelAdmin):
     list_display = ("recommendation", "action", "decided_by", "created_at")
     list_filter = ("action",)
+
+
+@admin.register(UploadedDataset)
+class UploadedDatasetAdmin(admin.ModelAdmin):
+    list_display = ("original_filename", "uploaded_by", "uploaded_at")
+    readonly_fields = ("uploaded_at",)

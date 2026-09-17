@@ -1,76 +1,91 @@
 """
-Load the ML team's export (beautypulse-vX) into the DB.
+Load the ML team's real export (beautypulse-adaptive-vX, schema_version 1.1)
+into the DB.
 
-Expected top-level shape, matching the real export we received:
+Real, confirmed top-level shape:
 
 {
-  "schema_version": "1.0",
-  "model_version": "beautypulse-v1",
-  "generated_at": "2026-09-18T08:00:00Z",
+  "schema_version": "1.1",
+  "model_version": "beautypulse-adaptive-v1",
+  "generated_at": "2026-09-17T14:45:28.877217+00:00",
+  "prediction_unit": "purchase_events",
   "candidates": [
     {
-      "sku_id": "5000001",
+      "sku_id": "5917178",
       "display_alias": "New Beauty SKU A",
-      "brand": "runail",
-      "category_cluster_id": "1487580005134238553",
+      "brand": "Unknown Brand",
+      "category_cluster_id": "1487580013950664926",
+      "category_code": null,
       "category_label": null,
-      "representative_price": 12.5,
-      "observed_launch_date": "2019-11-03",
+      "category_label_verified": false,
+      "representative_price": 16.35,
+      "observed_launch_date": "2019-12-30",
       "eligibility": "eligible",
+      "is_launch_candidate": true,
       "analogs": [
         {
-          "sku_id": "5000101",
-          "display_alias": "Historical Beauty SKU A",
-          "brand": "runail",
-          "category_cluster_id": "1487580005134238553",
-          "category_label": null,
-          "representative_price": 12.9,
-          "observed_launch_date": "2019-10-10",
-          "eligibility": "eligible",
-          "similarity_rank": 1,
-          "similarity_score": 0.93,
-          "similarity_reasons": ["Same category cluster", "Similar price band", "Same brand"],
-          "actual_purchase_events_7d": 105,
-          "actual_purchase_events_14d": 195
+          "sku_id": "5910474", "display_alias": "...", "brand": "dewal",
+          "category_cluster_id": "1487580013950664926", "category_code": null,
+          "category_label": null, "category_label_verified": false,
+          "representative_price": 16.71, "observed_launch_date": "2019-12-03",
+          "eligibility": "eligible", "is_launch_candidate": false,
+          "similarity_rank": 1, "similarity_score": 0.59,
+          "similarity_reasons": ["Same category cluster", "Similar price band"],
+          "actual_purchase_events_7d": 1, "actual_purchase_events_14d": 2
         }
       ],
-      "initial_forecast": {
-        "projected_total_day_7": 120, "projected_total_day_14": 210,
-        "range_low_day_7": 90, "range_high_day_7": 150,
-        "range_low_day_14": 170, "range_high_day_14": 260
-      },
-      "early_metrics": {
-        "day_cutoff": 3,
-        "views": 4200, "unique_viewers": 3300,
-        "cart_events": 310, "unique_cart_users": 270,
-        "remove_events": 35, "purchase_events": 58, "unique_purchasers": 52
-      },
-      "adaptive_forecast": {
-        "projected_total_day_7": 165, "projected_total_day_14": 290,
-        "change_day_7_percent": 37.5, "change_day_14_percent": 38.1,
-        "range_low_day_7": 145, "range_high_day_7": 185,
-        "range_low_day_14": 255, "range_high_day_14": 320
-      },
-      "alert": {
-        "status_code": "ABOVE_EXPECTATION",
-        "confidence": 0.78,
-        "evidence": ["Adaptive 14-day forecast increased by 38.1%", "..."]
-      }
+      "forecasts": [
+        {
+          "stage": "initial", "day_cutoff_used": null,
+          "forecast_7d": 1, "forecast_14d": 2,
+          "range_low_7d": 0, "range_high_7d": 5,
+          "range_low_14d": 0, "range_high_14d": 6,
+          "change_percent_7d": null, "change_percent_14d": null
+        },
+        {
+          "stage": "adaptive", "day_cutoff_used": 3,
+          "forecast_7d": 49.43, "forecast_14d": 136.53,
+          "range_low_7d": 47.4, "range_high_7d": 51.45,
+          "range_low_14d": 133.63, "range_high_14d": 139.44,
+          "change_percent_7d": 4842.6, "change_percent_14d": 6726.7
+        }
+      ],
+      "early_metrics": [
+        {
+          "day_cutoff": 3, "views": 217, "unique_viewers": 159,
+          "cart_events": 57, "unique_cart_users": 54, "remove_events": 9,
+          "purchase_events": 23, "unique_purchasers": 23
+        }
+      ],
+      "recommendations": [
+        {
+          "day_cutoff_used": 3, "status_code": "ABOVE_EXPECTATION",
+          "confidence": 0.568,
+          "evidence": ["Adaptive 14-day forecast increased by 6726.7% versus initial", "..."]
+        }
+      ]
     }
   ]
 }
 
-Note what this loader does NOT get from the ML export, and fills in itself:
-  - retailer_action / manufacturer_action: looked up from ACTION_MAP in
-    forecast/models.py, keyed on alert.status_code. This is a fixed business
-    rule owned by the backend, not something the ML model predicts.
-  - The adaptive ForecastResult's day_cutoff_used is taken from
-    early_metrics.day_cutoff (the export doesn't repeat it inside
-    adaptive_forecast itself).
+Key points vs earlier draft schemas:
+  - forecast field names now match our ForecastResult model 1:1
+    (forecast_7d, range_low_7d, change_percent_7d, ...) - no renaming needed.
+  - "forecasts", "early_metrics" and "recommendations" are all LISTS now
+    (so a product can eventually carry day-1, day-2, day-3 metrics/recs, or
+    multiple forecast stages) - loop over them, don't treat as a single dict.
+  - "is_launch_candidate" is sent explicitly by the ML export for both
+    candidates (true) and analogs (false) - we still apply a safety rule
+    on top: never let it flip an existing True back to False, in case the
+    same sku_id appears as a real candidate in one export and as someone
+    else's analog in another.
+  - retailer_action / manufacturer_action are still NOT in the export -
+    looked up from ACTION_MAP in forecast/models.py, keyed on status_code.
+  - confidence can be null (see SKU C in the sample) - the model field
+    allows null, so this passes through fine.
 
 Usage:
-    python manage.py load_demo_data path/to/export.json
-    python manage.py load_demo_data path/to/export.json --flush
+    python manage.py load_demo_data demo_predictions.json --flush
 """
 import json
 
@@ -89,7 +104,7 @@ from forecast.models import (
 
 
 class Command(BaseCommand):
-    help = "Load an ML export (candidates/analogs/forecasts/alert) into the database."
+    help = "Load the ML team's demo_predictions.json export into the database."
 
     def add_arguments(self, parser):
         parser.add_argument("json_path", type=str)
@@ -113,9 +128,12 @@ class Command(BaseCommand):
         if not candidates:
             raise CommandError("No 'candidates' key found (or it is empty) in the JSON file.")
 
-        model_version = payload.get("model_version", "unknown")
-        self.stdout.write(f"Loading export: schema_version={payload.get('schema_version')}, "
-                           f"model_version={model_version}, generated_at={payload.get('generated_at')}")
+        self.stdout.write(
+            f"Loading export: schema_version={payload.get('schema_version')}, "
+            f"model_version={payload.get('model_version')}, "
+            f"prediction_unit={payload.get('prediction_unit')}, "
+            f"generated_at={payload.get('generated_at')}"
+        )
 
         with transaction.atomic():
             if options["flush"]:
@@ -130,14 +148,11 @@ class Command(BaseCommand):
             counts = {"products": 0, "analogs": 0, "forecasts": 0, "metrics": 0, "recommendations": 0}
 
             for c in candidates:
-                product = self._upsert_product(c, is_launch_candidate=True)
+                product = self._upsert_product(c)
                 counts["products"] += 1
 
                 for a in c.get("analogs", []):
-                    # is_launch_candidate=False here, but _upsert_product never
-                    # downgrades an existing True back to False (see below) —
-                    # so a SKU that's a real candidate elsewhere stays visible.
-                    analog_product = self._upsert_product(a, is_launch_candidate=False)
+                    analog_product = self._upsert_product(a)  # analogs are full Product rows too
                     counts["products"] += 1
                     AnalogLink.objects.update_or_create(
                         target_product=product,
@@ -152,56 +167,40 @@ class Command(BaseCommand):
                     )
                     counts["analogs"] += 1
 
-                if init := c.get("initial_forecast"):
+                for fc in c.get("forecasts", []):
                     ForecastResult.objects.create(
                         product=product,
-                        stage="initial",
-                        day_cutoff_used=None,
-                        forecast_7d=init["projected_total_day_7"],
-                        forecast_14d=init["projected_total_day_14"],
-                        range_low_7d=init.get("range_low_day_7"),
-                        range_high_7d=init.get("range_high_day_7"),
-                        range_low_14d=init.get("range_low_day_14"),
-                        range_high_14d=init.get("range_high_day_14"),
+                        stage=fc["stage"],
+                        day_cutoff_used=fc.get("day_cutoff_used"),
+                        forecast_7d=fc["forecast_7d"],
+                        forecast_14d=fc["forecast_14d"],
+                        range_low_7d=fc.get("range_low_7d"),
+                        range_high_7d=fc.get("range_high_7d"),
+                        range_low_14d=fc.get("range_low_14d"),
+                        range_high_14d=fc.get("range_high_14d"),
+                        change_percent_7d=fc.get("change_percent_7d"),
+                        change_percent_14d=fc.get("change_percent_14d"),
                     )
                     counts["forecasts"] += 1
 
-                day_cutoff = None
-                if metrics := c.get("early_metrics"):
-                    day_cutoff = metrics["day_cutoff"]
+                for m in c.get("early_metrics", []):
                     EarlyMetric.objects.update_or_create(
                         product=product,
-                        day_cutoff=day_cutoff,
+                        day_cutoff=m["day_cutoff"],
                         defaults={
-                            "views": metrics.get("views", 0),
-                            "unique_viewers": metrics.get("unique_viewers", 0),
-                            "cart_events": metrics.get("cart_events", 0),
-                            "unique_cart_users": metrics.get("unique_cart_users", 0),
-                            "remove_events": metrics.get("remove_events", 0),
-                            "purchase_events": metrics.get("purchase_events", 0),
-                            "unique_purchasers": metrics.get("unique_purchasers", 0),
+                            "views": m.get("views", 0),
+                            "unique_viewers": m.get("unique_viewers", 0),
+                            "cart_events": m.get("cart_events", 0),
+                            "unique_cart_users": m.get("unique_cart_users", 0),
+                            "remove_events": m.get("remove_events", 0),
+                            "purchase_events": m.get("purchase_events", 0),
+                            "unique_purchasers": m.get("unique_purchasers", 0),
                         },
                     )
                     counts["metrics"] += 1
 
-                if adaptive := c.get("adaptive_forecast"):
-                    ForecastResult.objects.create(
-                        product=product,
-                        stage="adaptive",
-                        day_cutoff_used=day_cutoff,
-                        forecast_7d=adaptive["projected_total_day_7"],
-                        forecast_14d=adaptive["projected_total_day_14"],
-                        range_low_7d=adaptive.get("range_low_day_7"),
-                        range_high_7d=adaptive.get("range_high_day_7"),
-                        range_low_14d=adaptive.get("range_low_day_14"),
-                        range_high_14d=adaptive.get("range_high_day_14"),
-                        change_percent_7d=adaptive.get("change_day_7_percent"),
-                        change_percent_14d=adaptive.get("change_day_14_percent"),
-                    )
-                    counts["forecasts"] += 1
-
-                if alert := c.get("alert"):
-                    status_code = alert["status_code"]
+                for r in c.get("recommendations", []):
+                    status_code = r["status_code"]
                     try:
                         retailer_action, manufacturer_action = ACTION_MAP[status_code]
                     except KeyError:
@@ -212,17 +211,17 @@ class Command(BaseCommand):
                         )
                     Recommendation.objects.create(
                         product=product,
-                        day_cutoff_used=day_cutoff,
+                        day_cutoff_used=r.get("day_cutoff_used"),
                         status_code=status_code,
                         retailer_action=retailer_action,
                         manufacturer_action=manufacturer_action,
-                        confidence=alert.get("confidence"),
-                        evidence=alert.get("evidence", []),
+                        confidence=r.get("confidence"),
+                        evidence=r.get("evidence", []),
                     )
                     counts["recommendations"] += 1
 
                 # simulation_input never comes from the ML export (it's planner
-                # input) — seed a sane default only if nothing exists yet, so a
+                # input) - seed a sane default only if nothing exists yet, so a
                 # demo can proceed before the planner fills the Launch Setup form.
                 SimulationInput.objects.get_or_create(
                     product=product,
@@ -244,23 +243,24 @@ class Command(BaseCommand):
         )
 
     @staticmethod
-    def _upsert_product(p, is_launch_candidate):
+    def _upsert_product(p):
         defaults = {
             "display_alias": p.get("display_alias", ""),
             "brand": p.get("brand") or "Unknown Brand",
             "category_cluster_id": p["category_cluster_id"],
             "category_label": p.get("category_label"),
-            "category_label_verified": bool(p.get("category_label")),
+            "category_label_verified": bool(p.get("category_label_verified", False)),
             "representative_price": p["representative_price"],
             "observed_launch_date": p["observed_launch_date"],
             "eligibility": p.get("eligibility", "eligible"),
         }
         existing = Product.objects.filter(sku_id=p["sku_id"]).first()
+        incoming_flag = bool(p.get("is_launch_candidate", False))
         # Never downgrade True -> False: a SKU that's a real candidate
         # elsewhere in this same export must stay visible even when it also
         # shows up as someone else's analog.
         defaults["is_launch_candidate"] = bool(
-            is_launch_candidate or (existing and existing.is_launch_candidate)
+            incoming_flag or (existing and existing.is_launch_candidate)
         )
         product, _ = Product.objects.update_or_create(sku_id=p["sku_id"], defaults=defaults)
         return product

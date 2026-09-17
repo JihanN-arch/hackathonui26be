@@ -1,0 +1,329 @@
+{
+  "schema_version": "1.1",
+  "model_version": "beautypulse-adaptive-v1",
+  "generated_at": "2026-09-17T14:45:28.877217+00:00",
+  "prediction_unit": "purchase_events",
+  "candidates": [
+    {
+      "sku_id": "5917178",
+      "display_alias": "New Beauty SKU A",
+      "brand": "Unknown Brand",
+      "category_cluster_id": "1487580013950664926",
+      "category_code": null,
+      "category_label": null,
+      "category_label_verified": false,
+      "representative_price": 16.35,
+      "observed_launch_date": "2019-12-30",
+      "eligibility": "eligible",
+      "is_launch_candidate": true,
+      "analogs": [
+        {
+          "sku_id": "5910474",
+          "display_alias": "Historical Beauty SKU A1",
+          "brand": "dewal",
+          "category_cluster_id": "1487580013950664926",
+          "category_code": null,
+          "category_label": null,
+          "category_label_verified": false,
+          "representative_price": 16.71,
+          "observed_launch_date": "2019-12-03",
+          "eligibility": "eligible",
+          "is_launch_candidate": false,
+          "similarity_rank": 1,
+          "similarity_score": 0.59,
+          "similarity_reasons": [
+            "Same category cluster",
+            "Similar price band"
+          ],
+          "actual_purchase_events_7d": 1,
+          "actual_purchase_events_14d": 2
+        }
+      ],
+      "forecasts": [
+        {
+          "stage": "initial",
+          "day_cutoff_used": null,
+          "forecast_7d": 1,
+          "forecast_14d": 2,
+          "range_low_7d": 0,
+          "range_high_7d": 5,
+          "range_low_14d": 0,
+          "range_high_14d": 6,
+          "change_percent_7d": null,
+          "change_percent_14d": null
+        },
+        {
+          "stage": "adaptive",
+          "day_cutoff_used": 3,
+          "forecast_7d": 49.43,
+          "forecast_14d": 136.53,
+          "range_low_7d": 47.4,
+          "range_high_7d": 51.45,
+          "range_low_14d": 133.63,
+          "range_high_14d": 139.44,
+          "change_percent_7d": 4842.6,
+          "change_percent_14d": 6726.7
+        }
+      ],
+      "early_metrics": [
+        {
+          "day_cutoff": 3,
+          "views": 217,
+          "unique_viewers": 159,
+          "cart_events": 57,
+          "unique_cart_users": 54,
+          "remove_events": 9,
+          "purchase_events": 23,
+          "unique_purchasers": 23
+        }
+      ],
+      "recommendations": [
+        {
+          "day_cutoff_used": 3,
+          "status_code": "ABOVE_EXPECTATION",
+          "confidence": 0.568,
+          "evidence": [
+            "Adaptive 14-day forecast increased by 6726.7% versus initial",
+            "Day-3 purchase velocity is 7.7 events/day"
+          ]
+        }
+      ]
+    },
+    {
+      "sku_id": "5917130",
+      "display_alias": "New Beauty SKU B",
+      "brand": "f.o.x",
+      "category_cluster_id": "1487580005008409427",
+      "category_code": null,
+      "category_label": null,
+      "category_label_verified": false,
+      "representative_price": 4.52,
+      "observed_launch_date": "2020-01-20",
+      "eligibility": "eligible",
+      "is_launch_candidate": true,
+      "analogs": [
+        {
+          "sku_id": "5906938",
+          "display_alias": "Historical Beauty SKU B1",
+          "brand": "f.o.x",
+          "category_cluster_id": "1487580005008409427",
+          "category_code": null,
+          "category_label": null,
+          "category_label_verified": false,
+          "representative_price": 4.52,
+          "observed_launch_date": "2019-11-27",
+          "eligibility": "eligible",
+          "is_launch_candidate": false,
+          "similarity_rank": 1,
+          "similarity_score": 1,
+          "similarity_reasons": [
+            "Same category cluster",
+            "Similar price band",
+            "Same brand"
+          ],
+          "actual_purchase_events_7d": 1,
+          "actual_purchase_events_14d": 1
+        },
+        {
+          "sku_id": "5906944",
+          "display_alias": "Historical Beauty SKU B2",
+          "brand": "f.o.x",
+          "category_cluster_id": "1487580005008409427",
+          "category_code": null,
+          "category_label": null,
+          "category_label_verified": false,
+          "representative_price": 4.52,
+          "observed_launch_date": "2019-11-26",
+          "eligibility": "eligible",
+          "is_launch_candidate": false,
+          "similarity_rank": 2,
+          "similarity_score": 1,
+          "similarity_reasons": [
+            "Same category cluster",
+            "Similar price band",
+            "Same brand"
+          ],
+          "actual_purchase_events_7d": 1,
+          "actual_purchase_events_14d": 1
+        },
+        {
+          "sku_id": "5902924",
+          "display_alias": "Historical Beauty SKU B3",
+          "brand": "f.o.x",
+          "category_cluster_id": "1487580005008409427",
+          "category_code": null,
+          "category_label": null,
+          "category_label_verified": false,
+          "representative_price": 4.52,
+          "observed_launch_date": "2019-11-18",
+          "eligibility": "eligible",
+          "is_launch_candidate": false,
+          "similarity_rank": 3,
+          "similarity_score": 1,
+          "similarity_reasons": [
+            "Same category cluster",
+            "Similar price band",
+            "Same brand"
+          ],
+          "actual_purchase_events_7d": 0,
+          "actual_purchase_events_14d": 1
+        }
+      ],
+      "forecasts": [
+        {
+          "stage": "initial",
+          "day_cutoff_used": null,
+          "forecast_7d": 1,
+          "forecast_14d": 1,
+          "range_low_7d": 0,
+          "range_high_7d": 5,
+          "range_low_14d": 0,
+          "range_high_14d": 5,
+          "change_percent_7d": null,
+          "change_percent_14d": null
+        },
+        {
+          "stage": "adaptive",
+          "day_cutoff_used": 3,
+          "forecast_7d": 0.45,
+          "forecast_14d": 1,
+          "range_low_7d": 0,
+          "range_high_7d": 2.47,
+          "range_low_14d": 0,
+          "range_high_14d": 3.91,
+          "change_percent_7d": -55.4,
+          "change_percent_14d": 0.1
+        }
+      ],
+      "early_metrics": [
+        {
+          "day_cutoff": 3,
+          "views": 4,
+          "unique_viewers": 4,
+          "cart_events": 0,
+          "unique_cart_users": 0,
+          "remove_events": 0,
+          "purchase_events": 0,
+          "unique_purchasers": 0
+        }
+      ],
+      "recommendations": [
+        {
+          "day_cutoff_used": 3,
+          "status_code": "ON_TRACK",
+          "confidence": 0.928,
+          "evidence": [
+            "Adaptive 14-day forecast increased by 0.1% versus initial",
+            "Day-3 purchase velocity is 0.0 events/day"
+          ]
+        }
+      ]
+    },
+    {
+      "sku_id": "5915036",
+      "display_alias": "New Beauty SKU C",
+      "brand": "Unknown Brand",
+      "category_cluster_id": "1487580006317032337",
+      "category_code": null,
+      "category_label": null,
+      "category_label_verified": false,
+      "representative_price": 28.57,
+      "observed_launch_date": "2019-12-19",
+      "eligibility": "eligible",
+      "is_launch_candidate": true,
+      "analogs": [
+        {
+          "sku_id": "4876",
+          "display_alias": "Historical Beauty SKU C1",
+          "brand": "Unknown Brand",
+          "category_cluster_id": "1487580006317032337",
+          "category_code": null,
+          "category_label": null,
+          "category_label_verified": false,
+          "representative_price": 27.62,
+          "observed_launch_date": "2019-11-10",
+          "eligibility": "eligible",
+          "is_launch_candidate": false,
+          "similarity_rank": 1,
+          "similarity_score": 0.59,
+          "similarity_reasons": [
+            "Same category cluster",
+            "Similar price band"
+          ],
+          "actual_purchase_events_7d": 0,
+          "actual_purchase_events_14d": 0
+        },
+        {
+          "sku_id": "5593742",
+          "display_alias": "Historical Beauty SKU C2",
+          "brand": "busch",
+          "category_cluster_id": "1487580006317032337",
+          "category_code": null,
+          "category_label": null,
+          "category_label_verified": false,
+          "representative_price": 30.16,
+          "observed_launch_date": "2019-11-08",
+          "eligibility": "eligible",
+          "is_launch_candidate": false,
+          "similarity_rank": 2,
+          "similarity_score": 0.57,
+          "similarity_reasons": [
+            "Same category cluster",
+            "Similar price band"
+          ],
+          "actual_purchase_events_7d": 0,
+          "actual_purchase_events_14d": 0
+        }
+      ],
+      "forecasts": [
+        {
+          "stage": "initial",
+          "day_cutoff_used": null,
+          "forecast_7d": 0,
+          "forecast_14d": 0,
+          "range_low_7d": 0,
+          "range_high_7d": 4,
+          "range_low_14d": 0,
+          "range_high_14d": 4,
+          "change_percent_7d": null,
+          "change_percent_14d": null
+        },
+        {
+          "stage": "adaptive",
+          "day_cutoff_used": 3,
+          "forecast_7d": 2.01,
+          "forecast_14d": 5.94,
+          "range_low_7d": 0,
+          "range_high_7d": 4.04,
+          "range_low_14d": 3.04,
+          "range_high_14d": 8.85,
+          "change_percent_7d": 201.1,
+          "change_percent_14d": 594.2
+        }
+      ],
+      "early_metrics": [
+        {
+          "day_cutoff": 3,
+          "views": 86,
+          "unique_viewers": 71,
+          "cart_events": 13,
+          "unique_cart_users": 12,
+          "remove_events": 3,
+          "purchase_events": 0,
+          "unique_purchasers": 0
+        }
+      ],
+      "recommendations": [
+        {
+          "day_cutoff_used": 3,
+          "status_code": "HIGH_INTEREST_LOW_CONVERSION",
+          "confidence": null,
+          "evidence": [
+            "Early traffic is high relative to the training distribution",
+            "View-to-purchase conversion is low relative to the training distribution"
+          ]
+        }
+      ]
+    }
+  ]
+}

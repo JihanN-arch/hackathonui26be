@@ -200,3 +200,24 @@ class Decision(models.Model):
 
     class Meta:
         ordering = ["-created_at"]
+
+
+class UploadedDataset(models.Model):
+    """A raw file the user uploaded (e.g. their own Excel export).
+
+    MVP scope: we only ACCEPT and STORE the file here. We do not parse its
+    contents or write anything from it into Product/ForecastResult/etc.
+    Parsing/mapping the file into real data is a separate, later feature.
+    """
+
+    file = models.FileField(upload_to="uploaded_datasets/%Y/%m/%d/")
+    original_filename = models.CharField(max_length=255)
+    uploaded_by = models.CharField(max_length=128, blank=True)  # free text, no auth in MVP
+    note = models.TextField(blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-uploaded_at"]
+
+    def __str__(self):
+        return f"{self.original_filename} ({self.uploaded_at:%Y-%m-%d %H:%M})"

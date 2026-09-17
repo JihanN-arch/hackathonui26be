@@ -111,3 +111,19 @@ All responses are JSON. Errors use standard DRF shape:
   the loaded fixture, not the view code.
 - SQLite db file is `launchdemo/db.sqlite3` — delete it and re-run
   `migrate` + `load_demo_data` for a clean slate.
+
+## 7. File upload (accept-only, MVP scope)
+
+`POST /api/datasets/upload` (multipart/form-data, field name `file`)
+accepts a user's own `.xlsx`, `.xls`, or `.csv` file, stores it under
+`media/uploaded_datasets/`, and records who uploaded it — **that's it**.
+The file's contents are never read, parsed, or merged into
+Product/ForecastResult/etc. `GET /api/datasets/upload` lists what's been
+uploaded so far (useful for checking in `/admin` too, under "Uploaded
+datasets").
+
+If a later version of this project needs to actually turn an uploaded
+Excel file into new candidate SKUs, that's a separate, bigger feature
+(column mapping, validation, matching against the REES46 category/brand
+values) — intentionally not built here.
+

@@ -8,6 +8,7 @@ from .models import (
     Product,
     Recommendation,
     SimulationInput,
+    UploadedDataset,
 )
 
 
@@ -147,3 +148,10 @@ class DecisionSerializer(serializers.ModelSerializer):
             "created_at",
         ]
         read_only_fields = ["id", "created_at"]
+
+
+class UploadedDatasetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UploadedDataset
+        fields = ["id", "file", "original_filename", "uploaded_by", "note", "uploaded_at"]
+        read_only_fields = ["id", "original_filename", "uploaded_at"]
